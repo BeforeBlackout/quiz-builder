@@ -25,6 +25,7 @@ The example file sets `PORT=3001` and `FRONTEND_ORIGIN=http://localhost:3000`.
 | `npm run db:local` | Run an embedded Postgres on `localhost:5432` (no Docker) |
 | `npm run migrate`  | Apply migrations from `migrations/`                      |
 | `npm run db:seed`  | Insert the sample quiz if it is not already there        |
+| `npm test`         | Run unit and e2e tests against a throwaway Postgres      |
 | `npm run lint`     | Run ESLint                                               |
 | `npm run format`   | Run Prettier                                             |
 
@@ -34,7 +35,7 @@ The example file sets `PORT=3001` and `FRONTEND_ORIGIN=http://localhost:3000`.
 | -------- | -------------- | --------------------------------------------------------- | --------------------------------- |
 | `POST`   | `/quizzes`     | `201` with the created quiz                               | `400` with `[{ path, message }]`  |
 | `GET`    | `/quizzes`     | `200` with `[{ id, title, questionCount }]`, newest first |                                   |
-| `GET`    | `/quizzes/:id` | `200` with the quiz, its questions, and choices           | `400` for a non-numeric id, `404` |
+| `GET`    | `/quizzes/:id` | `200` with the quiz, its questions, and options           | `400` for a non-numeric id, `404` |
 | `DELETE` | `/quizzes/:id` | `204`                                                     | `400` for a non-numeric id, `404` |
 
 A `POST /quizzes` body looks like this:
@@ -58,12 +59,14 @@ A `POST /quizzes` body looks like this:
 }
 ```
 
-A quiz needs a title and 1 to 50 questions. A checkbox question needs 2 to 12 choices with at least one marked correct.
+A quiz needs a title and 1 to 50 questions. A checkbox question needs 2 to 12 options with at least one marked correct.
+
+In responses, each question carries only the answer field for its `type`: `booleanAnswer` for `BOOLEAN`, `textAnswer` for `INPUT`, `options` for `CHECKBOX`.
 
 ## Layout
 
-- `src/quizzes`: controller, service, request schema, and response types
-- `src/questions`, `src/options`: write questions and choices inside the quiz transaction
+- `src/quizzes`: controller, service, `create-quiz.schema.ts` (request body), and `quiz.dto.ts` (responses)
+- `src/questions`, `src/options`: write questions and options inside the quiz transaction. Each owns its `*.schema.ts` (request validation and limits) and `*.dto.ts` (response shape)
 - `src/prisma/contract.prisma`: data model. Run `npm run contract:emit` after changing it, then `npm run migration:plan` and `npm run migrate`
 - `src/prisma/seed.ts`: the sample quiz used by `npm run db:seed`
 - `module.ts`, `service.ts`: Prisma Composer wiring, used only by `npm run dev:composer` and `npm run deploy`
