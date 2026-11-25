@@ -1,4 +1,4 @@
-import type { CreateQuizInput } from "../quizzes/schemas/create.ts";
+import type { CreateQuizInput } from "../quizzes/create-quiz.schema.ts";
 
 export const sampleQuiz: CreateQuizInput = {
   title: "A short sample quiz",

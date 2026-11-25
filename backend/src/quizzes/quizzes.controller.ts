@@ -1,16 +1,8 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  Inject,
-  Param,
-  ParseIntPipe,
-  Post,
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Inject, Param, Post } from "@nestjs/common";
 
-import type { QuizDetailDto, QuizSummaryDto } from "./dto/quiz.dto.ts";
+import { ParseIdPipe } from "../pipes/parse-id.pipe.ts";
+import { createQuizSchema, type CreateQuizInput } from "./create-quiz.schema.ts";
+import type { QuizDetailDto, QuizSummaryDto } from "./quiz.dto.ts";
 import { QuizzesService } from "./quizzes.service.ts";
 
 @Controller("quizzes")
@@ -19,7 +11,7 @@ export class QuizzesController {
 
   @Post()
   @HttpCode(201)
-  create(@Body() body: unknown): Promise<QuizDetailDto> {
+  create(@Body({ schema: createQuizSchema }) body: CreateQuizInput): Promise<QuizDetailDto> {
     return this.quizzesService.create(body);
   }
 
@@ -29,13 +21,13 @@ export class QuizzesController {
   }
 
   @Get(":id")
-  findOne(@Param("id", ParseIntPipe) id: number): Promise<QuizDetailDto> {
+  findOne(@Param("id", ParseIdPipe) id: number): Promise<QuizDetailDto> {
     return this.quizzesService.findOne(id);
   }
 
   @Delete(":id")
   @HttpCode(204)
-  remove(@Param("id", ParseIntPipe) id: number): Promise<void> {
+  remove(@Param("id", ParseIdPipe) id: number): Promise<void> {
     return this.quizzesService.remove(id);
   }
 }

@@ -1,11 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 import type { DbClient } from "../prisma/db.ts";
-
-export type CreateOptionInput = {
-  text: string;
-  isCorrect: boolean;
-};
+import type { CreateOptionInput } from "./option.schema.ts";
 
 @Injectable()
 export class OptionsService {

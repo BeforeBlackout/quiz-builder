@@ -2,9 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 
 import { OptionsService } from "../options/options.service.ts";
 import type { DbClient } from "../prisma/db.ts";
-import type { CreateQuizInput } from "../quizzes/schemas/create.ts";
-
-export type CreateQuestionInput = CreateQuizInput["questions"][number];
+import type { CreateQuestionInput } from "./question.schema.ts";
 
 @Injectable()
 export class QuestionsService {
