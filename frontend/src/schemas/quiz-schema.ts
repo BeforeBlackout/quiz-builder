@@ -4,8 +4,10 @@ export const questionTypes = ["BOOLEAN", "INPUT", "CHECKBOX"] as const;
 
 export type QuestionTypeName = (typeof questionTypes)[number];
 
+export const minCheckboxOptions = 2;
+
 const optionSchema = z.object({
-  text: z.string().max(200, "Keep each choice under 200 characters"),
+  text: z.string().max(200, "Keep each option under 200 characters"),
   isCorrect: z.boolean(),
 });
 
@@ -14,7 +16,7 @@ const questionSchema = z.object({
   prompt: z.string().max(500, "Keep the question under 500 characters"),
   booleanAnswer: z.boolean(),
   textAnswer: z.string().max(300, "Keep the answer under 300 characters"),
-  options: z.array(optionSchema).max(12, "Use at most 12 choices"),
+  options: z.array(optionSchema).max(12, "Use at most 12 options"),
 });
 
 export const createQuizFormSchema = z
@@ -50,16 +52,16 @@ export const createQuizFormSchema = z
 
       if (question.type === "CHECKBOX") {
         const filled = question.options.filter((option) => option.text.trim().length > 0);
-        if (filled.length < 1) {
+        if (filled.length < minCheckboxOptions) {
           context.addIssue({
             code: "custom",
-            message: "Add at least one choice",
+            message: `Add at least ${minCheckboxOptions} options`,
             path: ["questions", index, "options"],
           });
         } else if (!filled.some((option) => option.isCorrect)) {
           context.addIssue({
             code: "custom",
-            message: "Mark at least one correct choice",
+            message: "Mark at least one correct option",
             path: ["questions", index, "options"],
           });
         }
@@ -81,38 +83,3 @@ export type CreateQuizPayload = {
       }
   >;
 };
-
-export function toCreateQuizPayload(value: CreateQuizForm): CreateQuizPayload {
-  return {
-    title: value.title.trim(),
-    questions: value.questions.map((question) => {
-      const prompt = question.prompt.trim();
-      if (question.type === "BOOLEAN") {
-        return { type: "BOOLEAN", prompt, booleanAnswer: question.booleanAnswer };
-      }
-      if (question.type === "INPUT") {
-        return { type: "INPUT", prompt, textAnswer: question.textAnswer.trim() };
-      }
-      return {
-        type: "CHECKBOX",
-        prompt,
-        options: question.options
-          .filter((option) => option.text.trim().length > 0)
-          .map((option) => ({ text: option.text.trim(), isCorrect: option.isCorrect })),
-      };
-    }),
-  };
-}
-
-export function blankQuestion(): CreateQuizForm["questions"][number] {
-  return {
-    type: "BOOLEAN",
-    prompt: "",
-    booleanAnswer: true,
-    textAnswer: "",
-    options: [
-      { text: "", isCorrect: true },
-      { text: "", isCorrect: false },
-    ],
-  };
-}

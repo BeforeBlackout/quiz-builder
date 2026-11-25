@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Controller,
   useFieldArray,
@@ -9,13 +11,21 @@ import {
 
 import { FieldError } from "@/components/FieldError";
 import { Icon } from "@/components/Icon";
-import { questionTypes, type CreateQuizForm, type QuestionTypeName } from "@/services/quiz-schema";
+import {
+  minCheckboxOptions,
+  questionTypes,
+  type CreateQuizForm,
+  type QuestionTypeName,
+} from "@/schemas/quiz-schema";
 
 const typeLabels: Record<QuestionTypeName, string> = {
   BOOLEAN: "Boolean",
   INPUT: "Input",
   CHECKBOX: "Checkbox",
 };
+
+const textActionClass =
+  "rounded-[5px] px-1.5 py-0.5 font-medium text-accent transition-colors hover:bg-accent-soft";
 
 type QuestionCardProps = {
   index: number;
@@ -37,16 +47,30 @@ export function QuestionCard({
   const questionErrors = errors.questions?.[index];
   const options = useFieldArray({ control, name: `questions.${index}.options` });
   const type = useWatch({ control, name: `questions.${index}.type` });
+  const optionValues = useWatch({ control, name: `questions.${index}.options` });
+
+  const answerOptions = optionValues ?? [];
+  const allSelected = answerOptions.length > 0 && answerOptions.every((option) => option.isCorrect);
+
+  function setAllCorrect(isCorrect: boolean) {
+    options.replace(
+      answerOptions.map((option) => ({
+        text: option.text,
+        isCorrect,
+      })),
+    );
+  }
 
   return (
-    <fieldset className="rounded-[12px] border border-line bg-card p-6">
+    <fieldset className="rounded-xl border border-line bg-card p-6">
       <legend className="sr-only">Question {index + 1}</legend>
       <div className="flex items-center justify-between gap-3">
         <span className="text-[13px] font-semibold text-ink">Question {index + 1}</span>
         <div className="flex items-center gap-2">
           <div className="relative">
             <select
-              className="h-[33px] min-w-[9.5rem] appearance-none rounded-[8px] border border-line bg-card py-1.5 pr-8 pl-3 text-[12px] text-ink"
+              aria-label="Question type"
+              className="h-8.25 min-w-38 appearance-none rounded-lg border border-line bg-card pr-8 pl-3 text-[12px] leading-5 text-ink"
               {...register(`questions.${index}.type`)}
             >
               {questionTypes.map((value) => (
@@ -75,7 +99,7 @@ export function QuestionCard({
       <div className="mt-5 grid gap-4">
         <label className="grid gap-1.5">
           <input
-            className="h-11 rounded-[8px] border border-border-input bg-card px-3.5 text-sm text-ink placeholder:text-muted"
+            className="h-11 rounded-lg border border-border-input bg-card px-3.5 text-sm text-ink placeholder:text-muted"
             placeholder="Write your question"
             {...register(`questions.${index}.prompt`)}
           />
@@ -93,19 +117,19 @@ export function QuestionCard({
                   {[
                     { label: "True", value: true },
                     { label: "False", value: false },
-                  ].map((choice) => {
-                    const selected = field.value === choice.value;
+                  ].map((answer) => {
+                    const selected = field.value === answer.value;
                     return (
                       <button
-                        key={choice.label}
+                        key={answer.label}
                         type="button"
-                        onClick={() => field.onChange(choice.value)}
-                        className={`inline-flex h-[39px] items-center gap-2 rounded-[6px] px-3.5 text-[13px] font-medium ${
+                        onClick={() => field.onChange(answer.value)}
+                        className={`inline-flex h-9.75 items-center gap-2 rounded-md px-3.5 text-[13px] font-medium ${
                           selected ? "bg-accent-soft text-accent" : "bg-paper text-muted"
                         }`}
                       >
                         <Icon src={selected ? "/icons/radio-on.svg" : "/icons/radio-off.svg"} />
-                        {choice.label}
+                        {answer.label}
                       </button>
                     );
                   })}
@@ -119,7 +143,7 @@ export function QuestionCard({
           <label className="grid gap-2">
             <span className="text-[11px] font-medium text-muted">Correct answer</span>
             <input
-              className="h-11 rounded-[8px] border border-border-input bg-card px-3.5 text-sm text-ink placeholder:text-muted"
+              className="h-11 rounded-lg border border-border-input bg-card px-3.5 text-sm text-ink placeholder:text-muted"
               placeholder="Short text"
               {...register(`questions.${index}.textAnswer`)}
             />
@@ -131,54 +155,65 @@ export function QuestionCard({
           <div className="grid gap-3">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[11px] font-medium text-muted">Answer options</span>
-              <span className="text-[11px] text-muted">Select all correct answers</span>
+              <button
+                type="button"
+                className={`${textActionClass} text-[11px]`}
+                onClick={() => setAllCorrect(!allSelected)}
+              >
+                {allSelected ? "Unselect all" : "Select all"}
+              </button>
             </div>
             <ul className="grid gap-2">
               {options.fields.map((option, optionIndex) => (
-                <li key={option.id} className="flex items-center gap-2.5">
-                  <Controller
-                    control={control}
-                    name={`questions.${index}.options.${optionIndex}.isCorrect`}
-                    render={({ field }) => (
-                      <button
-                        type="button"
-                        aria-label={`Choice ${optionIndex + 1} is correct`}
-                        aria-pressed={field.value}
-                        onClick={() => field.onChange(!field.value)}
-                        className={`flex size-[18px] shrink-0 items-center justify-center rounded-[4px] ${
-                          field.value ? "bg-accent" : "border border-[#bbc3ce] bg-card"
-                        }`}
-                      >
-                        {field.value ? <Icon src="/icons/check-white.svg" /> : null}
-                      </button>
-                    )}
-                  />
-                  <input
-                    className="min-w-0 flex-1 rounded-[8px] border border-border-input bg-card px-3.5 py-1.5 text-sm"
-                    placeholder={`Choice ${optionIndex + 1}`}
-                    {...register(`questions.${index}.options.${optionIndex}.text`)}
-                  />
-                  <button
-                    type="button"
-                    className="shrink-0 p-1 disabled:opacity-40"
-                    disabled={options.fields.length <= 1}
-                    aria-label={`Remove choice ${optionIndex + 1}`}
-                    onClick={() => options.remove(optionIndex)}
-                  >
-                    <Icon src="/icons/trash-sm.svg" />
-                  </button>
+                <li key={option.id} className="grid gap-1">
+                  <div className="flex items-center gap-2.5">
+                    <Controller
+                      control={control}
+                      name={`questions.${index}.options.${optionIndex}.isCorrect`}
+                      render={({ field }) => (
+                        <button
+                          type="button"
+                          aria-label={`Option ${optionIndex + 1} is correct`}
+                          aria-pressed={field.value}
+                          onClick={() => field.onChange(!field.value)}
+                          className={`flex size-4.5 shrink-0 items-center justify-center rounded-sm ${
+                            field.value ? "bg-accent" : "border border-[#bbc3ce] bg-card"
+                          }`}
+                        >
+                          {field.value ? <Icon src="/icons/check-white.svg" /> : null}
+                        </button>
+                      )}
+                    />
+                    <input
+                      className="min-w-0 flex-1 rounded-lg border border-border-input bg-card px-3.5 py-1.5 text-sm"
+                      placeholder={`Option ${optionIndex + 1}`}
+                      {...register(`questions.${index}.options.${optionIndex}.text`)}
+                    />
+                    <button
+                      type="button"
+                      className="shrink-0 p-1 disabled:opacity-40"
+                      disabled={options.fields.length <= minCheckboxOptions}
+                      aria-label={`Remove option ${optionIndex + 1}`}
+                      onClick={() => options.remove(optionIndex)}
+                    >
+                      <Icon src="/icons/trash-sm.svg" />
+                    </button>
+                  </div>
+                  <FieldError message={questionErrors?.options?.[optionIndex]?.text?.message} />
                 </li>
               ))}
             </ul>
             <button
               type="button"
-              className="inline-flex items-center gap-2 text-[12px] font-medium text-accent"
+              className={`${textActionClass} inline-flex w-fit items-center gap-2 text-[12px]`}
               onClick={() => options.append({ text: "", isCorrect: false })}
             >
               <Icon src="/icons/plus-sm.svg" />
               Add option
             </button>
-            <FieldError message={questionErrors?.options?.message} />
+            <FieldError
+              message={questionErrors?.options?.root?.message ?? questionErrors?.options?.message}
+            />
           </div>
         ) : null}
       </div>
