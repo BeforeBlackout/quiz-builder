@@ -22,6 +22,8 @@ export type QuizQuestion =
   | (QuizQuestionBase & { type: "INPUT"; textAnswer: string })
   | (QuizQuestionBase & { type: "CHECKBOX"; options: QuizOption[] });
 
+export type QuizQuestionOf<T extends QuizQuestion["type"]> = Extract<QuizQuestion, { type: T }>;
+
 export type QuizDetail = {
   id: number;
   title: string;

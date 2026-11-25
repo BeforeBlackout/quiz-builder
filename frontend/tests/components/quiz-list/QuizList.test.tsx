@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { useRouter } from "next/navigation";
 
 import { deleteQuiz } from "@/api/quiz";
-import { QuizList } from "@/components/QuizList";
+import { QuizList } from "@/components/quiz-list/QuizList";
 import type { QuizSummary } from "@/types/quiz";
 
 jest.mock("next/navigation", () => ({

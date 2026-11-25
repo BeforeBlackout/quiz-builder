@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { useRouter } from "next/navigation";
 
 import { createQuiz } from "@/api/quiz";
-import { CreateQuizForm } from "@/components/CreateQuizForm";
+import { CreateQuizForm } from "@/components/quiz-form/CreateQuizForm";
 import type { QuizDetail } from "@/types/quiz";
 import { ApiError } from "@/utils/api";
 

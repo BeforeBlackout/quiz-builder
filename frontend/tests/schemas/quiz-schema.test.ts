@@ -1,9 +1,11 @@
-import { createQuizFormSchema, type CreateQuizForm } from "@/schemas/quiz-schema";
+import {
+  createQuizFormSchema,
+  type CreateQuizFormValues,
+  type QuestionFormValues,
+} from "@/schemas/quiz-schema";
 import { blankQuestion } from "@/utils/quiz";
 
-type FormQuestion = CreateQuizForm["questions"][number];
-
-function form(questions: Array<Partial<FormQuestion>>, title = "Quiz"): CreateQuizForm {
+function form(questions: Array<Partial<QuestionFormValues>>, title = "Quiz"): CreateQuizFormValues {
   return {
     title,
     questions: questions.map((overrides) => ({
@@ -14,7 +16,7 @@ function form(questions: Array<Partial<FormQuestion>>, title = "Quiz"): CreateQu
   };
 }
 
-function issues(value: CreateQuizForm) {
+function issues(value: CreateQuizFormValues) {
   const result = createQuizFormSchema.safeParse(value);
   if (result.success) return [];
   return result.error.issues.map((issue) => ({ path: issue.path, message: issue.message }));

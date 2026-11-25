@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 
-import { FieldError } from "@/components/FieldError";
+import { FieldError } from "@/components/ui/FieldError";
 
 describe("FieldError", () => {
   it("renders the message", () => {

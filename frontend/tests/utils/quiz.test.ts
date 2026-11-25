@@ -1,7 +1,7 @@
-import type { CreateQuizForm } from "@/schemas/quiz-schema";
-import { blankQuestion, toCreateQuizPayload } from "@/utils/quiz";
+import type { QuestionFormValues } from "@/schemas/quiz-schema";
+import { blankQuestion, countByType, parseQuizId, toCreateQuizPayload } from "@/utils/quiz";
 
-function question(overrides: Partial<CreateQuizForm["questions"][number]>) {
+function question(overrides: Partial<QuestionFormValues>) {
   return { ...blankQuestion(), ...overrides };
 }
 
@@ -24,6 +24,38 @@ describe("blankQuestion", () => {
     first.options[0].text = "changed";
 
     expect(blankQuestion().options[0].text).toBe("");
+  });
+});
+
+describe("parseQuizId", () => {
+  it.each([
+    ["1", 1],
+    ["42", 42],
+    ["2147483647", 2_147_483_647],
+  ])("parses %p", (raw, expected) => {
+    expect(parseQuizId(raw)).toBe(expected);
+  });
+
+  it.each(["", "0", "01", "-1", "1.5", "abc", "1e3", "2147483648"])("rejects %p", (raw) => {
+    expect(parseQuizId(raw)).toBeNull();
+  });
+});
+
+describe("countByType", () => {
+  it("counts every question type, including unused ones", () => {
+    expect(countByType([{ type: "BOOLEAN" }, { type: "CHECKBOX" }, { type: "BOOLEAN" }])).toEqual({
+      BOOLEAN: 2,
+      INPUT: 0,
+      CHECKBOX: 1,
+    });
+  });
+
+  it("skips missing entries while the form is still filling in", () => {
+    expect(countByType([undefined, {}, { type: "INPUT" }])).toEqual({
+      BOOLEAN: 0,
+      INPUT: 1,
+      CHECKBOX: 0,
+    });
   });
 });
 

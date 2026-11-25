@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-export const questionTypes = ["BOOLEAN", "INPUT", "CHECKBOX"] as const;
-
-export type QuestionTypeName = (typeof questionTypes)[number];
-
-export const minCheckboxOptions = 2;
+import { minCheckboxOptions, questionTypes } from "@/constants/quiz";
 
 const optionSchema = z.object({
   text: z.string().max(200, "Keep each option under 200 characters"),
@@ -69,7 +65,9 @@ export const createQuizFormSchema = z
     });
   });
 
-export type CreateQuizForm = z.infer<typeof createQuizFormSchema>;
+export type CreateQuizFormValues = z.infer<typeof createQuizFormSchema>;
+
+export type QuestionFormValues = CreateQuizFormValues["questions"][number];
 
 export type CreateQuizPayload = {
   title: string;

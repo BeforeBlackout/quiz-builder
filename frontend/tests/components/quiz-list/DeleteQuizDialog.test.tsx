@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { deleteQuiz } from "@/api/quiz";
-import { DeleteQuizDialog } from "@/components/DeleteQuizDialog";
+import { DeleteQuizDialog } from "@/components/quiz-list/DeleteQuizDialog";
 import { ApiError } from "@/utils/api";
 
 jest.mock("@/api/quiz", () => ({
@@ -83,14 +83,14 @@ describe("DeleteQuizDialog", () => {
     expect(confirm).toHaveFocus();
   });
 
-  it("deletes the quiz and reports the deleted id", async () => {
+  it("deletes the quiz and reports success", async () => {
     deleteQuizMock.mockResolvedValue(undefined);
     const { user, onDeleted } = renderDialog();
 
     await user.click(screen.getByRole("button", { name: "Delete quiz" }));
 
     expect(deleteQuizMock).toHaveBeenCalledWith(4);
-    expect(onDeleted).toHaveBeenCalledWith(4);
+    expect(onDeleted).toHaveBeenCalledTimes(1);
   });
 
   it("disables every way out while the delete is in flight", async () => {
@@ -110,7 +110,7 @@ describe("DeleteQuizDialog", () => {
 
     finish();
     await screen.findByRole("button", { name: "Delete quiz" });
-    expect(onDeleted).toHaveBeenCalledWith(4);
+    expect(onDeleted).toHaveBeenCalledTimes(1);
   });
 
   it("shows the API error message when deletion fails", async () => {

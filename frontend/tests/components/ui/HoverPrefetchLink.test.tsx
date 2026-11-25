@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { HoverPrefetchLink } from "@/components/HoverPrefetchLink";
+import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
 
 describe("HoverPrefetchLink", () => {
   it("renders a link with the given props", () => {

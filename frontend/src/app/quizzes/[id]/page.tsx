@@ -1,32 +1,24 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
-import { Icon } from "@/components/Icon";
-import { QuestionView } from "@/components/quiz-detail/QuestionView";
 import { getQuiz } from "@/api/quiz";
-import type { QuestionTypeName } from "@/schemas/quiz-schema";
+import { QuestionView } from "@/components/quiz-detail/QuestionView";
+import { Callout } from "@/components/ui/Callout";
+import { Icon } from "@/components/ui/Icon";
+import { PageTitle } from "@/components/ui/PageHeader";
+import { SummaryCard } from "@/components/ui/SummaryCard";
+import { questionTypeLabels, questionTypes } from "@/constants/quiz";
 import type { QuizDetail } from "@/types/quiz";
 import { ApiError } from "@/utils/api";
+import { formatDate, pad2, pluralize } from "@/utils/format";
+import { countByType, parseQuizId } from "@/utils/quiz";
 
-function pad2(value: number) {
-  return String(value).padStart(2, "0");
-}
+const fetchQuiz = cache(getQuiz);
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-const QUIZ_ID_MAX = 2_147_483_647;
-
-function parseQuizId(raw: string) {
-  if (!/^[1-9]\d*$/.test(raw)) return null;
-  const id = Number(raw);
-  return id <= QUIZ_ID_MAX ? id : null;
+function isNotFound(error: unknown) {
+  return error instanceof ApiError && error.status === 404;
 }
 
 async function loadQuiz(rawId: string): Promise<QuizDetail> {
@@ -34,9 +26,9 @@ async function loadQuiz(rawId: string): Promise<QuizDetail> {
   if (id === null) notFound();
 
   try {
-    return await getQuiz(id);
+    return await fetchQuiz(id);
   } catch (caught) {
-    if (caught instanceof ApiError && caught.status === 404) notFound();
+    if (isNotFound(caught)) notFound();
     throw caught;
   }
 }
@@ -49,13 +41,13 @@ export async function generateMetadata({ params }: PageProps<"/quizzes/[id]">): 
   }
 
   try {
-    const quiz = await getQuiz(id);
+    const quiz = await fetchQuiz(id);
     return {
       title: quiz.title,
       description: "Review this quiz's questions and correct answers.",
     };
   } catch (caught) {
-    if (caught instanceof ApiError && caught.status === 404) {
+    if (isNotFound(caught)) {
       return {
         title: "Quiz not found",
         description: "This quiz doesn't exist or has been deleted.",
@@ -65,19 +57,30 @@ export async function generateMetadata({ params }: PageProps<"/quizzes/[id]">): 
   }
 }
 
+function QuizOverview({ quiz }: { quiz: QuizDetail }) {
+  const counts = countByType(quiz.questions);
+  const typesUsed = Object.values(counts).filter((count) => count > 0).length;
+
+  return (
+    <SummaryCard
+      title="Quiz overview"
+      icon="/icons/book-overview.svg"
+      stats={[
+        { label: "Questions", value: pad2(quiz.questions.length) },
+        { label: "Question types", value: pad2(typesUsed) },
+      ]}
+      rows={questionTypes.map((type) => ({
+        label: questionTypeLabels[type],
+        value: pluralize(counts[type], "question"),
+      }))}
+    />
+  );
+}
+
 export default async function QuizDetailPage({ params }: PageProps<"/quizzes/[id]">) {
   const { id: rawId } = await params;
   const quiz = await loadQuiz(rawId);
-
-  const counts: Record<QuestionTypeName, number> = {
-    BOOLEAN: 0,
-    INPUT: 0,
-    CHECKBOX: 0,
-  };
-  for (const question of quiz.questions) {
-    counts[question.type] += 1;
-  }
-  const typesUsed = (Object.values(counts) as number[]).filter((count) => count > 0).length;
+  const questionCount = pluralize(quiz.questions.length, "question");
 
   return (
     <div className="mx-auto flex w-full max-w-280 flex-col gap-6">
@@ -89,9 +92,9 @@ export default async function QuizDetailPage({ params }: PageProps<"/quizzes/[id
           <Icon src="/icons/back.svg" />
           Back to my quizzes
         </Link>
-        <h1 className="text-[31px] leading-[1.45] font-semibold tracking-tight">{quiz.title}</h1>
+        <PageTitle>{quiz.title}</PageTitle>
         <p className="text-[12px] text-muted">
-          {quiz.questions.length} {quiz.questions.length === 1 ? "question" : "questions"}
+          {questionCount}
           {"    ·    "}
           Created {formatDate(quiz.createdAt)}
         </p>
@@ -108,9 +111,7 @@ export default async function QuizDetailPage({ params }: PageProps<"/quizzes/[id
         <div className="grid gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Quiz structure</h2>
-            <p className="text-[12px] text-muted">
-              {quiz.questions.length} {quiz.questions.length === 1 ? "question" : "questions"}
-            </p>
+            <p className="text-[12px] text-muted">{questionCount}</p>
           </div>
 
           <ol className="grid gap-4">
@@ -127,50 +128,11 @@ export default async function QuizDetailPage({ params }: PageProps<"/quizzes/[id
         </div>
 
         <aside className="grid gap-5">
-          <section className="rounded-xl border border-line bg-card p-6">
-            <div className="flex items-center gap-3">
-              <Icon src="/icons/book-overview.svg" />
-              <h2 className="text-base font-semibold">Quiz overview</h2>
-            </div>
-            <div className="mt-5 flex gap-3">
-              <div className="w-32">
-                <p className="text-[31px] font-semibold leading-none">
-                  {pad2(quiz.questions.length)}
-                </p>
-                <p className="mt-1 text-[11px] text-muted">Questions</p>
-              </div>
-              <div className="w-32">
-                <p className="text-[31px] font-semibold leading-none">{pad2(typesUsed)}</p>
-                <p className="mt-1 text-[11px] text-muted">Question types</p>
-              </div>
-            </div>
-            <div className="my-5 h-px bg-line" />
-            {(
-              [
-                ["BOOLEAN", "Boolean"],
-                ["INPUT", "Input"],
-                ["CHECKBOX", "Checkbox"],
-              ] as const
-            ).map(([key, label]) => (
-              <div key={key} className="flex items-center justify-between py-1.5 text-[12px]">
-                <span className="text-muted">{label}</span>
-                <span className="font-medium">
-                  {counts[key]} {counts[key] === 1 ? "question" : "questions"}
-                </span>
-              </div>
-            ))}
-          </section>
-
-          <section className="rounded-lg bg-success-soft p-5.5">
-            <div className="flex items-center gap-3">
-              <Icon src="/icons/check-tip.svg" />
-              <p className="text-[13px] font-semibold text-success">The answer key, at a glance.</p>
-            </div>
-            <p className="mt-2.5 text-[12px] leading-[1.45] text-success-muted">
-              Correct answers are highlighted in green. This view is for reviewing your quiz, not
-              taking it.
-            </p>
-          </section>
+          <QuizOverview quiz={quiz} />
+          <Callout tone="success" icon="/icons/check-tip.svg" title="The answer key, at a glance.">
+            Correct answers are highlighted in green. This view is for reviewing your quiz, not
+            taking it.
+          </Callout>
         </aside>
       </div>
     </div>

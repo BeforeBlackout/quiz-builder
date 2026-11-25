@@ -9,6 +9,10 @@ export class ApiError extends Error {
   }
 }
 
+export function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof ApiError ? error.message : fallback;
+}
+
 export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
