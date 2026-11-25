@@ -1,4 +1,4 @@
-import { ApiError, request } from "@/utils/api";
+import { ApiError, getErrorMessage, request } from "@/utils/api";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
@@ -28,6 +28,16 @@ const fetchMock = jest.fn();
 beforeEach(() => {
   fetchMock.mockReset();
   global.fetch = fetchMock;
+});
+
+describe("getErrorMessage", () => {
+  it("uses the ApiError message", () => {
+    expect(getErrorMessage(new ApiError("Quiz not found", 404), "Fallback")).toBe("Quiz not found");
+  });
+
+  it.each([new Error("boom"), "boom", null])("falls back for %p", (error) => {
+    expect(getErrorMessage(error, "Fallback")).toBe("Fallback");
+  });
 });
 
 describe("request", () => {
