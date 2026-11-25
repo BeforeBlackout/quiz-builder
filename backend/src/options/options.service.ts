@@ -15,7 +15,7 @@ export class OptionsService {
     options: CreateOptionInput[],
   ): Promise<void> {
     for (const [position, option] of options.entries()) {
-      await client.orm.public.Choice.create({
+      await client.orm.public.Option.create({
         questionId,
         position,
         text: option.text,

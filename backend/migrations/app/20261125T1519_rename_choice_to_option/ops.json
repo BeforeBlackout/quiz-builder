@@ -1,0 +1,290 @@
+[
+  {
+    "id": "renameTable.Choice",
+    "label": "Rename table \"Choice\" to \"Option\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Option"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Choice\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Choice\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Choice\""
+        }
+      },
+      {
+        "description": "ensure table \"Option\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Option\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "rename table \"Choice\" to \"Option\"",
+        "sql": "ALTER TABLE \"public\".\"Choice\" RENAME TO \"Option\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Option\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Option\""
+        }
+      },
+      {
+        "description": "verify table \"Choice\" no longer exists",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Choice\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Choice\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "primaryKey.public.Option.Choice_pkey.rename",
+    "label": "Rename primary key \"Choice_pkey\" to \"Option_pkey\" on \"Option\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "primaryKey",
+        "name": "Option_pkey",
+        "table": "Option"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Choice_pkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Choice_pkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"Choice_pkey\" on \"Option\""
+        }
+      },
+      {
+        "description": "ensure constraint \"Option_pkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Option_pkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Option_pkey\" on \"Option\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "rename primary key \"Choice_pkey\" to \"Option_pkey\"",
+        "sql": "ALTER TABLE \"public\".\"Option\" RENAME CONSTRAINT \"Choice_pkey\" TO \"Option_pkey\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Option_pkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Option_pkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"Option_pkey\" on \"Option\""
+        }
+      },
+      {
+        "description": "verify constraint \"Choice_pkey\" no longer exists",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Choice_pkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Choice_pkey\" on \"Option\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.public.Option.Choice_questionId_fkey.rename",
+    "label": "Rename foreign key \"Choice_questionId_fkey\" to \"Option_questionId_fkey\" on \"Option\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Option_questionId_fkey",
+        "table": "Option"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Choice_questionId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Choice_questionId_fkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"Choice_questionId_fkey\" on \"Option\""
+        }
+      },
+      {
+        "description": "ensure constraint \"Option_questionId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Option_questionId_fkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Option_questionId_fkey\" on \"Option\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "rename foreign key \"Choice_questionId_fkey\" to \"Option_questionId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Option\" RENAME CONSTRAINT \"Choice_questionId_fkey\" TO \"Option_questionId_fkey\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Option_questionId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Option_questionId_fkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"Option_questionId_fkey\" on \"Option\""
+        }
+      },
+      {
+        "description": "verify constraint \"Choice_questionId_fkey\" no longer exists",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Choice_questionId_fkey",
+          "public",
+          "\"public\".\"Option\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Choice_questionId_fkey\" on \"Option\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "index.public.Option.Choice_questionId_idx_fdb42076.rename",
+    "label": "Rename index \"Choice_questionId_idx_fdb42076\" to \"Option_questionId_idx_fdb42076\" on \"Option\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Option_questionId_idx_fdb42076",
+        "table": "Option"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Choice_questionId_idx_fdb42076\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Choice_questionId_idx_fdb42076\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "index \"Choice_questionId_idx_fdb42076\""
+        }
+      },
+      {
+        "description": "ensure index \"Option_questionId_idx_fdb42076\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Option_questionId_idx_fdb42076\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Option_questionId_idx_fdb42076\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "rename index \"Choice_questionId_idx_fdb42076\" to \"Option_questionId_idx_fdb42076\"",
+        "sql": "ALTER INDEX \"public\".\"Choice_questionId_idx_fdb42076\" RENAME TO \"Option_questionId_idx_fdb42076\"",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Option_questionId_idx_fdb42076\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Option_questionId_idx_fdb42076\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "index \"Option_questionId_idx_fdb42076\""
+        }
+      },
+      {
+        "description": "verify index \"Choice_questionId_idx_fdb42076\" no longer exists",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Choice_questionId_idx_fdb42076\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Choice_questionId_idx_fdb42076\""
+        }
+      }
+    ]
+  }
+]

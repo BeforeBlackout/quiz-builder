@@ -4,8 +4,8 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
-    "Choice": {
-      "model": "Choice",
+    "Option": {
+      "model": "Option",
       "namespace": "public"
     },
     "Question": {
@@ -40,7 +40,7 @@
           }
         },
         "models": {
-          "Choice": {
+          "Option": {
             "fields": {
               "id": {
                 "nullable": false,
@@ -115,7 +115,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "Choice"
+              "table": "Option"
             }
           },
           "Question": {
@@ -198,7 +198,7 @@
                   ]
                 },
                 "to": {
-                  "model": "Choice",
+                  "model": "Option",
                   "namespace": "public"
                 }
               },
@@ -332,7 +332,7 @@
       "public": {
         "entries": {
           "table": {
-            "Choice": {
+            "Option": {
               "columns": {
                 "id": {
                   "codecId": "pg/int4@1",
@@ -371,7 +371,7 @@
               "foreignKeys": [
                 {
                   "index": {
-                    "name": "Choice_questionId_idx_fdb42076"
+                    "name": "Option_questionId_idx_fdb42076"
                   },
                   "onDelete": "cascade",
                   "source": {
@@ -379,7 +379,7 @@
                       "questionId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "Choice"
+                    "tableName": "Option"
                   },
                   "target": {
                     "columns": [
@@ -395,8 +395,8 @@
                   "columns": [
                     "questionId"
                   ],
-                  "name": "Choice_questionId_idx_fdb42076",
-                  "prefix": "Choice_questionId_idx",
+                  "name": "Option_questionId_idx_fdb42076",
+                  "prefix": "Option_questionId_idx",
                   "unique": false
                 }
               ],
@@ -579,7 +579,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "9fa1745728605fde3c662c835068d2c309bda5d561fe09f380d8e0016ff322ea"
+    "storageHash": "610aca3d79f123b3f35d3bc3fbe4623c277fb1186537c010933cda0ad55b702a"
   },
   "execution": {
     "executionHash": "b065e970da1c723f0090ab4df7d4f75b7ebab8805b0a94dd8b5d34c2a086048d",

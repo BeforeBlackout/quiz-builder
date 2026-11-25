@@ -24,13 +24,13 @@ model Question {
   prompt        String
   booleanAnswer Boolean?
   textAnswer    String?
-  options       Choice[]
+  options       Option[]
   createdAt     DateTime     @default(now()) @onCreate(now())
 
   @@index([quizId])
 }
 
-model Choice {
+model Option {
   id         Int      @id @default(autoincrement())
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionId Int

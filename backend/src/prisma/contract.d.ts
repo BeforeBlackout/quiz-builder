@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract-types';
 
 export type StorageHash =
-  StorageHashBase<'9fa1745728605fde3c662c835068d2c309bda5d561fe09f380d8e0016ff322ea'>;
+  StorageHashBase<'610aca3d79f123b3f35d3bc3fbe4623c277fb1186537c010933cda0ad55b702a'>;
 export type ExecutionHash =
   ExecutionHashBase<'b065e970da1c723f0090ab4df7d4f75b7ebab8805b0a94dd8b5d34c2a086048d'>;
 export type ProfileHash =
@@ -324,12 +324,12 @@ export type StorageColumnInputTypes = ColumnTypesFromStorage<
 >;
 
 export namespace Models {
-  export type public_Choice = {
-    id: FieldOutputTypes['public']['Choice']['id'];
-    isCorrect: FieldOutputTypes['public']['Choice']['isCorrect'];
-    position: FieldOutputTypes['public']['Choice']['position'];
-    questionId: FieldOutputTypes['public']['Choice']['questionId'];
-    text: FieldOutputTypes['public']['Choice']['text'];
+  export type public_Option = {
+    id: FieldOutputTypes['public']['Option']['id'];
+    isCorrect: FieldOutputTypes['public']['Option']['isCorrect'];
+    position: FieldOutputTypes['public']['Option']['position'];
+    questionId: FieldOutputTypes['public']['Option']['questionId'];
+    text: FieldOutputTypes['public']['Option']['text'];
     question: public_Question;
     readonly [RelationKeys]?: 'question';
   };
@@ -342,7 +342,7 @@ export namespace Models {
     quizId: FieldOutputTypes['public']['Question']['quizId'];
     textAnswer: FieldOutputTypes['public']['Question']['textAnswer'];
     type: FieldOutputTypes['public']['Question']['type'];
-    options: public_Choice[];
+    options: public_Option[];
     quiz: public_Quiz;
     readonly [RelationKeys]?: 'options' | 'quiz';
   };
@@ -358,7 +358,7 @@ export namespace Models {
 
 export declare const models: {
   public: {
-    Choice: Models.public_Choice;
+    Option: Models.public_Option;
     Question: Models.public_Question;
     Quiz: Models.public_Quiz;
   };
@@ -382,7 +382,7 @@ type ContractBase = Omit<
         readonly kind: 'postgres-schema';
         readonly entries: {
           readonly table: {
-            readonly Choice: {
+            readonly Option: {
               columns: {
                 readonly id: {
                   readonly dataType: 'pg/int4';
@@ -427,8 +427,8 @@ type ContractBase = Omit<
               uniques: readonly [];
               indexes: readonly [
                 {
-                  readonly name: 'Choice_questionId_idx_fdb42076';
-                  readonly prefix: 'Choice_questionId_idx';
+                  readonly name: 'Option_questionId_idx_fdb42076';
+                  readonly prefix: 'Option_questionId_idx';
                   readonly columns: readonly ['questionId'];
                   readonly unique: false;
                 },
@@ -437,7 +437,7 @@ type ContractBase = Omit<
                 {
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'Choice';
+                    readonly tableName: 'Option';
                     readonly columns: readonly ['questionId'];
                   };
                   readonly target: {
@@ -587,7 +587,7 @@ type ContractBase = Omit<
   readonly target: 'postgres';
   readonly targetFamily: 'sql';
   readonly roots: {
-    readonly Choice: { readonly namespace: 'public' & NamespaceId; readonly model: 'Choice' };
+    readonly Option: { readonly namespace: 'public' & NamespaceId; readonly model: 'Option' };
     readonly Question: { readonly namespace: 'public' & NamespaceId; readonly model: 'Question' };
     readonly Quiz: { readonly namespace: 'public' & NamespaceId; readonly model: 'Quiz' };
   };
@@ -595,7 +595,7 @@ type ContractBase = Omit<
     readonly namespaces: {
       readonly public: {
         readonly models: {
-          readonly Choice: {
+          readonly Option: {
             readonly fields: {
               readonly id: {
                 readonly nullable: false;
@@ -633,7 +633,7 @@ type ContractBase = Omit<
               };
             };
             readonly storage: {
-              readonly table: 'Choice';
+              readonly table: 'Option';
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly id: { readonly column: 'id' };
@@ -687,7 +687,7 @@ type ContractBase = Omit<
               readonly options: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Choice';
+                  readonly model: 'Option';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
