@@ -14,7 +14,7 @@
     "db:update": "prisma db update",
     "db:verify": "prisma db verify",
     "deploy": "npm run composer:deploy",
-    "dev": "tsx watch src/main.ts",
+    "dev": "NODE_ENV=development tsx watch src/main.ts",
     "db:seed": "tsx src/prisma/seed-cli.ts",
     "db:local": "tsx src/prisma/local-db.ts",
     "lint": "eslint src eslint.config.mjs",
