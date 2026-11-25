@@ -1,0 +1,71 @@
+{
+  "name": "backend",
+  "private": true,
+  "packageManager": "npm@10.9.3",
+  "type": "module",
+  "engines": {
+    "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
+  },
+  "scripts": {
+    "composer:deploy": "prisma deploy",
+    "composer:dev": "prisma dev",
+    "contract:emit": "prisma contract emit",
+    "db:init": "prisma db init",
+    "db:update": "prisma db update",
+    "db:verify": "prisma db verify",
+    "deploy": "npm run composer:deploy",
+    "dev": "tsx watch src/main.ts",
+    "db:seed": "tsx src/prisma/seed-cli.ts",
+    "db:local": "tsx src/prisma/local-db.ts",
+    "lint": "eslint src eslint.config.mjs",
+    "format": "prettier --write .",
+    "dev:composer": "npm run composer:dev",
+    "migrate": "prisma db migrate",
+    "migration:plan": "prisma migration plan",
+    "migration:show": "prisma migration show",
+    "migration:status": "prisma migration status",
+    "skills:sync": "prisma skills sync || exit 0",
+    "start": "tsx src/main.ts",
+    "postinstall": "prisma skills sync || exit 0"
+  },
+  "dependencies": {
+    "@nestjs/common": "^12.2.0",
+    "@nestjs/config": "^12.1.1",
+    "@nestjs/core": "^12.2.0",
+    "@nestjs/platform-express": "^12.2.0",
+    "@prisma/composer": "0.40.0",
+    "@prisma/composer-prisma-cloud": "0.40.0",
+    "@prisma/orm-postgres": "8.0.0-rc.25",
+    "alchemy": "2.0.0-beta.87",
+    "dotenv": "^18.0.10",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "temporal-polyfill": "^1.0.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@prisma/dev": "0.25.2",
+    "@types/node": "^26.6.5",
+    "embedded-postgres": "^19.0.0-beta.20",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.10.1",
+    "prisma": "8.0.0-rc.35",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.74.0"
+  },
+  "overrides": {
+    "effect": "4.1.4",
+    "@effect/platform-bun": "4.1.4",
+    "@effect/platform-node": "4.1.4",
+    "@effect/platform-node-shared": "4.1.4",
+    "@effect/vitest": "4.1.4",
+    "@vitejs/devtools": "0.7.6"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "@embedded-postgres/linux-x64@19.0.0-beta.20": true
+  }
+}

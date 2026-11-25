@@ -1,0 +1,42 @@
+// use prisma-8
+
+enum QuestionType {
+  @@type("pg/text@1")
+  BOOLEAN  = "BOOLEAN"
+  INPUT    = "INPUT"
+  CHECKBOX = "CHECKBOX"
+}
+
+model Quiz {
+  id        Int        @id @default(autoincrement())
+  title     String
+  questions Question[]
+  createdAt DateTime   @default(now()) @onCreate(now())
+  updatedAt DateTime   @default(now()) @onCreate(now()) @onUpdate(now())
+}
+
+model Question {
+  id            Int          @id @default(autoincrement())
+  quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId        Int
+  position      Int
+  type          QuestionType
+  prompt        String
+  booleanAnswer Boolean?
+  textAnswer    String?
+  options       Choice[]
+  createdAt     DateTime     @default(now()) @onCreate(now())
+
+  @@index([quizId])
+}
+
+model Choice {
+  id         Int      @id @default(autoincrement())
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId Int
+  position   Int
+  text       String
+  isCorrect  Boolean  @default(false)
+
+  @@index([questionId])
+}
