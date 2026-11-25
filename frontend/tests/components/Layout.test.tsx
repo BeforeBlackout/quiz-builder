@@ -22,8 +22,8 @@ describe("Layout", () => {
     expect(screen.getByRole("main")).toHaveTextContent("Page body");
   });
 
-  it.each(["/quizzes", "/quizzes/12"])("highlights My quizzes on %s", (pathname) => {
-    usePathnameMock.mockReturnValue(pathname);
+  it("highlights My quizzes on /quizzes", () => {
+    usePathnameMock.mockReturnValue("/quizzes");
     render(<Layout>content</Layout>);
 
     const link = screen.getByRole("link", { name: "My quizzes" });
@@ -31,12 +31,15 @@ describe("Layout", () => {
     expect(link.querySelector("img")).toHaveAttribute("src", "/icons/grid-active.svg");
   });
 
-  it.each(["/create", "/quizzes-archive"])("does not highlight My quizzes on %s", (pathname) => {
-    usePathnameMock.mockReturnValue(pathname);
-    render(<Layout>content</Layout>);
+  it.each(["/quizzes/12", "/create", "/quizzes-archive"])(
+    "does not highlight My quizzes on %s",
+    (pathname) => {
+      usePathnameMock.mockReturnValue(pathname);
+      render(<Layout>content</Layout>);
 
-    const link = screen.getByRole("link", { name: "My quizzes" });
-    expect(link).not.toHaveClass("text-accent");
-    expect(link.querySelector("img")).toHaveAttribute("src", "/icons/grid.svg");
-  });
+      const link = screen.getByRole("link", { name: "My quizzes" });
+      expect(link).not.toHaveClass("text-accent");
+      expect(link.querySelector("img")).toHaveAttribute("src", "/icons/grid.svg");
+    },
+  );
 });

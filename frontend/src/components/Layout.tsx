@@ -37,7 +37,7 @@ export function Layout({ children }: { children: ReactNode }) {
               Workspace
             </p>
             {links.map((link) => {
-              const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+              const active = pathname === link.href;
               return (
                 <Link
                   key={link.href}
