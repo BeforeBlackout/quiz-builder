@@ -13,11 +13,12 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "esModuleInterop": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "*.ts", "prisma.config.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "*.ts", "prisma.config.ts"]
 }
